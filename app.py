@@ -3,6 +3,7 @@ from dash import dcc
 from dash import html
 import pandas as pd
 import numpy as np
+from BPTK_Py import Model
 from dash.dependencies import Output, Input
 
 from model_setup import *
