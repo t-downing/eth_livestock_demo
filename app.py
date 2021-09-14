@@ -119,7 +119,7 @@ def update_model(var1, var2):
     df21 = illness_death_rate.plot(return_df=True).reset_index()
     df3 = birth_rate.plot(return_df=True).reset_index()
     date_label = "Elapsed time (days)"
-    chart1_figure = {
+    chart2_figure = {
         "data": [
             {
                 "x": df1.iloc[:, 0],
@@ -144,7 +144,7 @@ def update_model(var1, var2):
             "colorway": ["#17B897"],
         }
     }
-    chart2_figure = {
+    chart1_figure = {
         "data": [
             {
                 "name": "Death rate",
