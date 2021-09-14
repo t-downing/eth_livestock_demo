@@ -17,6 +17,7 @@ external_stylesheets = [
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.title = "Ethiopia Livestock SD model"
+server = app.server
 
 app.layout = html.Div(
     children=[
