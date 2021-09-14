@@ -48,12 +48,12 @@ app.layout = html.Div(
                         html.Div(children="Livestock health", className="menu-title"),
                         dcc.Slider(
                             id="input-var1",
-                            min=0.0,
+                            min=0.5,
                             max=1.0,
                             step=0.05,
                             value=1.0,
                             marks={
-                                0: "0",
+                                0.5: "0",
                                 1: "1"
                             },
                             # className="dropdown",
