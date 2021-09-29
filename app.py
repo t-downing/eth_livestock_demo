@@ -9,6 +9,7 @@ import plotly.express as px
 from model_operations import *
 from import_data import *
 
+
 # read in external data
 df_input = import_all_data()
 

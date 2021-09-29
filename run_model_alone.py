@@ -1,7 +1,6 @@
 import pandas as pd
 import BPTK_Py
 import plotly.express as px
-import time
 from model_operations import *
 from datetime import datetime
 from import_data import *
