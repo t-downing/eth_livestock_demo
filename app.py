@@ -3,11 +3,25 @@ from dash import dcc
 from dash import html
 import pandas as pd
 import numpy as np
-from BPTK_Py import Model
-from dash.dependencies import Output, Input
+from datetime import datetime
+from dash.dependencies import Output, Input, State
+import plotly.express as px
+from model_operations import *
+from import_data import *
 
-from model_setup import *
+# read in external data
+df_input = import_all_data()
 
+# initialize values ONLY FOR HTML
+initial_start_date, initial_stop_date = datetime(2018, 1, 1), datetime.now()
+model_env, model = setup_model(initial_start_date, initial_stop_date, df_input)
+variables = [str(var) for var in model.stocks] \
+            + [str(var) for var in model.flows] \
+            + [str(var) for var in model.converters]
+min_date = serial_to_datetime(1.0)
+max_date = datetime.now()
+
+# setup app
 external_stylesheets = [
     {
         "href": "https://fonts.googleapis.com/css2?"
@@ -15,14 +29,16 @@ external_stylesheets = [
         "rel": "stylesheet",
     },
 ]
-
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.title = "Ethiopia Livestock SD model"
 server = app.server
 
+# app layout
 app.layout = html.Div(
+    # whole app
     children=[
         html.Div(
+            # header
             children=[
                 html.P(children="🐮", className="header-emoji"),
                 html.H1(
@@ -42,12 +58,31 @@ app.layout = html.Div(
             className="header"
         ),
         html.Div(
+            # date
             children=[
+                html.Div(
+                    children="Date Range",
+                    className="menu-title"
+                ),
+                dcc.DatePickerRange(
+                    id="date-range",
+                    min_date_allowed=min_date,
+                    max_date_allowed=max_date,
+                    start_date=initial_start_date,
+                    end_date=initial_stop_date
+                )
+            ],
+            className="menu",
+        ),
+        html.Div(
+            # menu 1
+            children=[
+                html.Div(children="Scenario A:"),
                 html.Div(
                     children=[
                         html.Div(children="Livestock health", className="menu-title"),
                         dcc.Slider(
-                            id="input-var1",
+                            id="scenario-A-var-1",
                             min=0.5,
                             max=1.0,
                             step=0.05,
@@ -56,7 +91,6 @@ app.layout = html.Div(
                                 0.5: "0",
                                 1: "1"
                             },
-                            # className="dropdown",
                         ),
                     ]
                 ),
@@ -64,7 +98,7 @@ app.layout = html.Div(
                     children=[
                         html.Div(children="Livestock fertility (births per year)", className="menu-title"),
                         dcc.Slider(
-                            id="input-var2",
+                            id="scenario-A-var-2",
                             min=0.0,
                             max=0.5,
                             step=0.01,
@@ -73,7 +107,6 @@ app.layout = html.Div(
                                 0: "0",
                                 0.5: "0.5"
                             },
-                            className="dropdown",
                         ),
                     ]
                 ),
@@ -81,103 +114,152 @@ app.layout = html.Div(
             className="menu",
         ),
         html.Div(
+            # menu 2
             children=[
+                html.Div(children="Scenario B:"),
                 html.Div(
-                    children=dcc.Graph(
-                        id="output-chart1", config={"displayModeBar": False},
-                    ),
-                    className="card",
+                    children=[
+                        html.Div(children="Livestock health", className="menu-title"),
+                        dcc.Slider(
+                            id="scenario-B-var-1",
+                            min=0.5,
+                            max=1.0,
+                            step=0.05,
+                            value=1.0,
+                            marks={
+                                0.5: "0",
+                                1: "1"
+                            },
+                        ),
+                    ]
                 ),
                 html.Div(
-                    children=dcc.Graph(
-                        id="output-chart2", config={"displayModeBar": False},
-                    ),
-                    className="card",
+                    children=[
+                        html.Div(children="Livestock fertility (births per year)", className="menu-title"),
+                        dcc.Slider(
+                            id="scenario-B-var-2",
+                            min=0.0,
+                            max=0.5,
+                            step=0.01,
+                            value=0.3,
+                            marks={
+                                0: "0",
+                                0.5: "0.5"
+                            },
+                        ),
+                    ]
                 ),
             ],
+            className="menu",
+        ),
+        html.Div(
+            # charts
+            children=[
+                html.Div(children="Plotting variable", className="menu-title"),
+                dcc.Dropdown(
+                    id="chart-1-y",
+                    options=[
+                        {"label": variable,
+                         "value": variable}
+                        for variable in variables
+                    ],
+                    clearable=False,
+                    value="Producer Stock",
+                    className="dropdown",
+                ),
+                html.Div(
+                    children=dcc.Graph(
+                        id="chart-1", config={"displayModeBar": False},
+                    ),
+                    className="card",
+                ),
+                # html.Div(
+                #     children=dcc.Graph(
+                #         id="output-chart2", config={"displayModeBar": False},
+                #     ),
+                #     className="card",
+                # ),
+            ],
             className="wrapper",
+        ),
+        dcc.Store(
+            id="stored-runs",
         ),
     ]
 )
 
 
 @app.callback(
-    [
-        Output("output-chart1", "figure"),
-        Output("output-chart2", "figure")
-    ],
-    [
-        Input("input-var1", "value"),
-        Input("input-var2", "value")
-    ]
+    Output("stored-runs", "data"),
+    Input("date-range", "start_date"),
+    Input("date-range", "end_date"),
+    Input("scenario-A-var-1", "value"),
+    Input("scenario-A-var-2", "value"),
+    Input("scenario-B-var-1", "value"),
+    Input("scenario-B-var-2", "value"),
+    State("stored-runs", "data")
 )
-def update_model(var1, var2):
-    animal_health.equation = float(var1)
-    fertility_baseline.equation = float(var2) / 365
-    df1 = producer_stock.plot(return_df=True).reset_index()
-    df2 = death_rate.plot(return_df=True).reset_index()
-    df21 = illness_death_rate.plot(return_df=True).reset_index()
-    df3 = birth_rate.plot(return_df=True).reset_index()
-    date_label = "Elapsed time (days)"
-    chart2_figure = {
-        "data": [
-            {
-                "x": df1.iloc[:, 0],
-                "y": df1.iloc[:, 1],
-                "type": "lines"
-            }
-        ],
-        "layout": {
-            "title": {
-                "text": "Producer stock",
-                "x": 0.05,
-                "xanchor": "left",
-            },
-            "xaxis": {
-                "fixedrange": True,
-                "title": date_label
-            },
-            "yaxis": {
-                "fixedrange": True,
-                "title": "Number of livestock (TLU)"
-            },
-            "colorway": ["#17B897"],
+def run_scenario_x(
+        start_date_str,
+        stop_date_str,
+        scenario_A_var_1,
+        scenario_A_var_2,
+        scenario_B_var_1,
+        scenario_B_var_2,
+        stored_runs
+):
+    ctx = dash.callback_context
+    start_date = datetime.fromisoformat(start_date_str)
+    stop_date = datetime.fromisoformat(stop_date_str)
+    run_scenario_a, run_scenario_b = False, False
+    if not ctx.triggered:
+        df = run_model(model_env, model, "startup", {}, start_date, stop_date)
+        trigger_variable = "date-range"
+    else:
+        df = pd.read_json(stored_runs, orient="split")
+        trigger_variable = ctx.triggered[0]["prop_id"].split(".")[0]
+    if trigger_variable == "date-range":
+        run_scenario_a, run_scenario_b = True, True
+    if "scenario-A" in trigger_variable: run_scenario_a = True
+    if "scenario-B" in trigger_variable: run_scenario_b = True
+    if run_scenario_a:
+        scenario = "A"
+        constants = {
+            "Animal Health": scenario_A_var_1,
+            "Fertility Baseline": scenario_A_var_2 / 365.0,
         }
-    }
-    chart1_figure = {
-        "data": [
-            {
-                "name": "Death rate",
-                "x": df2.iloc[:, 0],
-                "y": df2.iloc[:, 1] * 365 + df21.iloc[:, 1] * 365,
-                "type": "lines",
-                "color": "red"
-            },
-            {
-                "name": "Birth rate",
-                "x": df3.iloc[:, 0],
-                "y": df3.iloc[:, 1] * 365,
-                "type": "lines"
-            }
-        ],
-        "layout": {
-            "title": {
-                "text": "Birth and death rates",
-                "x": 0.05,
-                "xanchor": "left",
-            },
-            "xaxis": {
-                "title": date_label,
-                "fixedrange": True,
-            },
-            "yaxis": {
-                "title": "Rate (TLU/year)",
-                "fixedrange": True
-            },
-            # "colorway": ["#17B897"],
-        },
-    }
-    return chart1_figure, chart2_figure
+        run_df = run_model(model_env, model, scenario, constants, start_date, stop_date)
+        df.drop(df[df["Scenario"] == scenario].index, inplace=True)
+        df = df.append(run_df, ignore_index=True)
+    if run_scenario_b:
+        scenario = "B"
+        constants = {
+            "Animal Health": scenario_B_var_1,
+            "Fertility Baseline": scenario_B_var_2 / 365.0,
+        }
+        run_df = run_model(model_env, model, scenario, constants, start_date, stop_date)
+        df.drop(df[df["Scenario"] == scenario].index, inplace=True)
+        df = df.append(run_df, ignore_index=True)
+    # terrible terrible bodge
+    df.drop(df[df["Scenario"] == "startup"].index, inplace=True)
+    stored_runs = df.to_json(date_format='iso', orient='split')
+    return stored_runs
+
+
+@app.callback(
+    Output("chart-1", "figure"),
+    Input("chart-1-y", "value"),
+    Input("stored-runs", "data")
+)
+def update_chart_1(chart_1_y, stored_runs):
+    df = pd.read_json(stored_runs, orient="split")
+    fig = px.line(
+        df.sort_values(["Scenario", "t"]),
+        x="Date",
+        y=chart_1_y,
+        color="Scenario"
+    )
+    return fig
 
 
 if __name__ == '__main__':

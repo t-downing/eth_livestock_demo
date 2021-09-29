@@ -1,17 +1,23 @@
-from model_setup import *
 import pandas as pd
-import matplotlib.pyplot as plt
+import BPTK_Py
+import plotly.express as px
+import time
+from model_operations import *
+from datetime import datetime
+from import_data import *
 
-#df1 = pd.DataFrame(columns=["time", "values"])
+# read data into df
+df_input = import_all_data()
 
-df1 = producer_stock.plot(return_df=True).reset_index()
-df2 = death_rate.plot(return_df=True).reset_index()
+# setup model
+start_date, stop_date = datetime(2020, 1, 1), datetime.now()
+model_env, model = setup_model(start_date, stop_date, df_input)
 
+print(f"start is {model.starttime}, stop is {model.stoptime}")
 
-print(df1.iloc[:,1])
+# run base scenario
+df = run_model(model_env, model, "base", {}, start_date, stop_date)
 
-print(df2.iloc[:,1])
+px.line(df, x="Date", y=["CPI (FAO)"]).show()
 
-plt.interactive(False)
-#plt.show()
 

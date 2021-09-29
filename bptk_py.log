@@ -1,0 +1,30 @@
+2021-09-15 11:05:16.440530, [ERROR] Neither any agents nor equations to simulate given! Aborting!
+2021-09-15 11:06:03.500027, [ERROR] Scenario manager "sm" not found! Did you maybe mean one of "smEth_livestock"?
+2021-09-15 11:06:03.500561, [ERROR] Scenario "base" not found in any scenario manager!
+2021-09-15 11:06:03.500672, [WARN] No output data produced. Hopefully this was your intention.
+2021-09-15 11:13:30.616698, [ERROR] Scenario manager "smETH_livestock" not found! Did you maybe mean one of "smEth_livestock"?
+2021-09-15 11:13:30.617709, [ERROR] Scenario "base" not found in any scenario manager!
+2021-09-15 11:13:30.617860, [WARN] No output data produced. Hopefully this was your intention.
+2021-09-15 11:13:38.423127, [ERROR] Scenario manager "smETH_livestock" not found! Did you maybe mean one of "smEth_livestock"?
+2021-09-15 11:13:38.439125, [ERROR] Scenario "base" not found in any scenario manager!
+2021-09-15 11:13:38.439252, [WARN] No output data produced. Hopefully this was your intention.
+2021-09-15 11:14:44.923433, [ERROR] Scenario manager "smETH_livestock" not found! Did you maybe mean one of "smEth_livestock"?
+2021-09-15 11:14:44.924416, [ERROR] Scenario "base" not found in any scenario manager!
+2021-09-15 11:14:44.924502, [WARN] No output data produced. Hopefully this was your intention.
+2021-09-15 11:14:57.406623, [ERROR] Scenario manager "smETH_livestock" not found! Did you maybe mean one of "smEth_livestock"?
+2021-09-15 11:14:57.406824, [ERROR] Scenario "base" not found in any scenario manager!
+2021-09-15 11:14:57.407173, [WARN] No output data produced. Hopefully this was your intention.
+2021-09-15 12:02:05.375193, [WARN] The scenario manager already exists. Will not change the model. Use another name to avoid surprising errors!
+2021-09-15 12:22:12.212007, [WARN] The scenario manager already exists. Will not change the model. Use another name to avoid surprising errors!
+2021-09-15 15:55:37.067612, [WARN] The scenario manager already exists. Will not change the model. Use another name to avoid surprising errors!
+2021-09-15 15:59:25.486547, [ERROR] Scenario manager "sm" not found! Did you maybe mean one of "smEth_livestock, scenario_manager"?
+2021-09-15 15:59:25.487096, [ERROR] Scenario "s1" not found in any scenario manager!
+2021-09-15 15:59:25.487184, [WARN] No output data produced. Hopefully this was your intention.
+2021-09-15 15:59:39.504627, [WARN] The scenario manager already exists. Will not change the model. Use another name to avoid surprising errors!
+2021-09-15 16:01:19.524231, [WARN] The scenario manager already exists. Will not change the model. Use another name to avoid surprising errors!
+2021-09-15 16:24:38.942931, [WARN] The scenario manager already exists. Will not change the model. Use another name to avoid surprising errors!
+2021-09-15 16:25:25.850099, [WARN] The scenario manager already exists. Will not change the model. Use another name to avoid surprising errors!
+2021-09-15 16:26:31.407174, [WARN] The scenario manager already exists. Will not change the model. Use another name to avoid surprising errors!
+2021-09-15 16:27:10.761472, [WARN] The scenario manager already exists. Will not change the model. Use another name to avoid surprising errors!
+2021-09-15 16:27:35.031249, [WARN] The scenario manager already exists. Will not change the model. Use another name to avoid surprising errors!
+2021-09-15 17:21:41.486571, [ERROR] Scenario "s1" not found in any scenario manager! Did you maybe mean one of "s0"?
