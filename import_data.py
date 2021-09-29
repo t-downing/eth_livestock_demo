@@ -5,7 +5,6 @@ import plotly.express as px
 from hdx.utilities.easy_logging import setup_logging
 from hdx.hdx_configuration import Configuration
 from hdx.data.dataset import Dataset
-from pathlib import Path
 
 
 def import_all_data():
